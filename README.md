@@ -82,6 +82,7 @@ Keep .env private (it’s already in .gitignore).
 
 Set the same environment variables in your hosting platform (Vercel, Netlify, etc.).
 
+ ```bash
 Run Locally
 
 # Clone the repository
