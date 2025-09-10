@@ -12,7 +12,7 @@
 .env.keys
 .env.local
 .env.*.local
-
+!.env.example
 # -------------------
 # Supabase config (sensitive)
 # -------------------
