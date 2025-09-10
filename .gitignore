@@ -36,7 +36,6 @@ bun.lockb
 # -------------------
 .env
 .env.*
-!.env.example   # safe to keep a template in Git
 
 # -------------------
 # Supabase
