@@ -1,0 +1,23 @@
+# -------------------
+# Supabase CLI junk
+# -------------------
+.branches
+.temp
+
+# -------------------
+# Environment / dotenvx
+# -------------------
+.env
+.env.*
+.env.keys
+.env.local
+.env.*.local
+
+# -------------------
+# Supabase config (sensitive)
+# -------------------
+config.toml
+
+# -------------------
+# Supabase build outputs (functions build output)
+functions/**/dist
