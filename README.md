@@ -73,8 +73,8 @@ This project requires a `.env` file. An example is provided as `.env.example`.
    cp .env.example .env
 Fill in your own keys:
 
-env
-
+.env :
+ ```bas
 VITE_SUPABASE_URL="https://<your-project-ref>.supabase.co"
 VITE_SUPABASE_PUBLISHABLE_KEY="sb_publishable_xxxxxxxxxxxxxxxxx"
 OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
