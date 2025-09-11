@@ -217,12 +217,13 @@ const Interview = () => {
           <div className="text-center bg-white/80 backdrop-blur-md rounded-2xl p-8 border border-blue-200/50 shadow-xl">
             <h2 className="text-2xl font-bold mb-2 text-slate-800">Question not found</h2>
             <p className="text-slate-600">Current index: {currentIndex}, Total questions: {questions.length}</p>
-            <button 
+            <Button 
               onClick={() => setCurrentIndex(0)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              variant="gradient"
+              className="mt-4"
             >
               Reset to first question
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -241,45 +242,58 @@ const Interview = () => {
       <div className="relative z-30">
         {/* Top Bar */}
         <header className="border-b border-blue-200/30 bg-white/80 backdrop-blur-md shadow-xl">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+        <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+          <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
             {/* Left: Exit */}
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-slate-600 hover:text-slate-800 hover:bg-blue-100/50"
+              className="text-slate-600 hover:text-slate-800 hover:bg-blue-100/50 text-xs sm:text-sm px-2 sm:px-4"
               onClick={handleExitInterview}
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Exit Interview
+              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Exit Interview</span>
+              <span className="sm:hidden">Exit</span>
             </Button>
             
             {/* Center: Progress */}
-            <div className="flex-1 mx-8">
+            <div className="flex-1 mx-2 sm:mx-4 lg:mx-8">
               <div className="text-center mb-2">
-                <span className="text-sm font-medium text-slate-700">
-                  Question {currentIndex + 1} of {questions.length}
+                <span className="text-xs sm:text-sm font-medium text-slate-700">
+                  {currentIndex + 1}/{questions.length}
                 </span>
               </div>
-              <Progress value={progress} className="h-2 bg-blue-100" />
+              <Progress value={progress} className="h-1.5 sm:h-2 bg-blue-100" />
             </div>
             
             {/* Right: Timer & Next */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-700 bg-blue-50 px-3 py-1.5 rounded-lg">
-                <Clock className="h-4 w-4 text-blue-600" />
-                {timeRemaining}
+            <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
+              <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-slate-700 bg-blue-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <span className="tabular-nums">{timeRemaining}</span>
               </div>
               {!isSubmitted && (
-                <Button size="sm" onClick={handleNext} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                  {currentIndex === questions.length - 1 ? 'Finish' : 'Skip'}
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                <Button 
+                  size="sm" 
+                  onClick={handleNext} 
+                  variant="gradient"
+                  className="text-xs sm:text-sm px-2 sm:px-4"
+                >
+                  <span className="hidden sm:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Skip'}</span>
+                  <span className="sm:hidden">{currentIndex === questions.length - 1 ? 'End' : 'Skip'}</span>
+                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                 </Button>
               )}
               {isSubmitted && (
-                <Button size="sm" onClick={handleNext} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                  {currentIndex === questions.length - 1 ? 'Finish' : 'Next'}
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                <Button 
+                  size="sm" 
+                  onClick={handleNext} 
+                  variant="gradient"
+                  className="text-xs sm:text-sm px-2 sm:px-4"
+                >
+                  <span className="hidden sm:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Next'}</span>
+                  <span className="sm:hidden">{currentIndex === questions.length - 1 ? 'End' : 'Next'}</span>
+                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                 </Button>
               )}
             </div>
@@ -288,24 +302,28 @@ const Interview = () => {
         </header>
 
         {/* Main Content */}
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
+        <main className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Question Panel */}
-          <QuestionPanel
-            question={currentQuestion}
-            questionNumber={currentIndex + 1}
-            totalQuestions={questions.length}
-          />
+          <div className="order-1">
+            <QuestionPanel
+              question={currentQuestion}
+              questionNumber={currentIndex + 1}
+              totalQuestions={questions.length}
+            />
+          </div>
 
           {/* Answer Panel */}
-          <AnswerPanel
-            question={currentQuestion}
-            answer={currentAnswer}
-            onAnswerChange={handleAnswerChange}
-            onSubmit={handleSubmitAnswer}
-            isSubmitted={isSubmitted}
-            isLiveMode={settings.liveMode}
-          />
+          <div className="order-2">
+            <AnswerPanel
+              question={currentQuestion}
+              answer={currentAnswer}
+              onAnswerChange={handleAnswerChange}
+              onSubmit={handleSubmitAnswer}
+              isSubmitted={isSubmitted}
+              isLiveMode={settings.liveMode}
+            />
+          </div>
         </div>
 
         {/* Feedback Panel (only show if quick feedback is on and answer is submitted) */}
@@ -319,20 +337,24 @@ const Interview = () => {
         )}
 
         {/* Bottom Navigation */}
-        <div className="mt-8 flex justify-between">
+        <div className="mt-4 sm:mt-8 flex justify-between items-center">
           <Button 
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg border border-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="gradient"
+            size="sm"
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Previous
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Previous</span>
+            <span className="sm:hidden">Prev</span>
           </Button>
           
           <div className="flex gap-3">
             {isEvaluating && (
-              <div className="text-sm text-slate-600 self-center bg-blue-50 px-3 py-1 rounded-lg">
-                Evaluating answer...
+              <div className="text-xs sm:text-sm text-slate-600 self-center bg-blue-50 px-2 sm:px-3 py-1 rounded-lg">
+                <span className="hidden sm:inline">Evaluating answer...</span>
+                <span className="sm:hidden">Evaluating...</span>
               </div>
             )}
           </div>

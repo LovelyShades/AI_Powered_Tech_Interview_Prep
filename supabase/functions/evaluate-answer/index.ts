@@ -216,37 +216,54 @@ serve(async (req) => {
       console.log("No test results found or not a coding question");
     }
 
-    const prompt = `Evaluate this ${question.qtype} interview answer:
+    // Create a more focused prompt based on question type
+    let evaluationPrompt = "";
+    if (question.qtype === "Coding") {
+      evaluationPrompt = `Evaluate this coding interview answer with test results:
 
 Question: ${question.title} (${question.difficulty})
-${question.prompt}
+User's Answer: "${answerContent}"
 
-${question.expected_answer ? `Expected approach: ${question.expected_answer}` : ""}
+Test Results: ${testResults ? `${testResults.passed}/${testResults.total} tests passed` : 'No tests available'}
 
-IMPORTANT: The following is the candidate's ACTUAL ANSWER:
-"${answerContent}"
-
-CRITICAL: Only evaluate what the user actually said/wrote. 
-Do NOT assume they said anything from the question prompt or expected answer.
-
-Provide evaluation as JSON:
+Provide honest evaluation as JSON:
 {
-  "score": ${baseScore}, 
-  "strengths": ["point 1", "point 2"], 
-  "improvements": ["point 1", "point 2"], 
-  "solution": "Brief canonical solution (max 150 words)"
+  "score": ${baseScore},
+  "strengths": ["specific positive points about their approach"],
+  "improvements": ["specific areas needing work"],
+  "solution": "Brief explanation of what could be improved"
 }`;
+    } else {
+      evaluationPrompt = `Evaluate this ${question.qtype} interview answer:
+
+Question: ${question.title} (${question.difficulty})
+Prompt: ${question.prompt}
+
+Candidate's Answer: "${answerContent}"
+
+Provide detailed, personalized evaluation as JSON:
+{
+  "score": 75,
+  "strengths": ["specific good points from their answer"],
+  "improvements": ["specific areas to enhance based on their response"],
+  "solution": "Additional insights or better approach they could consider"
+}`;
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${openAIApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-5-2025-08-07",
+        model: "gpt-4.1-2025-04-14",
         messages: [
-          { role: "system", content: "You are an expert technical interviewer. Provide fair, constructive feedback." },
-          { role: "user", content: prompt },
+          { 
+            role: "system", 
+            content: "You are an experienced technical interviewer. Provide honest, specific, and constructive feedback. Always respond with valid JSON only." 
+          },
+          { role: "user", content: evaluationPrompt },
         ],
-        max_completion_tokens: 500,
+        max_tokens: 800,
+        temperature: 0.7,
       }),
     });
 
@@ -272,17 +289,55 @@ Provide evaluation as JSON:
 
     let evaluation;
     try {
-      evaluation = JSON.parse(data.choices[0].message.content);
+      const content = data.choices[0].message.content.trim();
+      console.log("AI Response content:", content);
+      
+      if (!content) {
+        throw new Error("Empty response from AI");
+      }
+      
+      evaluation = JSON.parse(content);
     } catch (e) {
       console.error("Failed to parse evaluation JSON:", e.message);
       console.error("Raw content:", data.choices[0].message.content);
-      // Fallback evaluation if JSON parsing fails
-      evaluation = {
-        score: baseScore,
-        strengths: ["Code runs successfully", "Correct logic implementation"],
-        improvements: ["Consider edge cases", "Add more detailed comments"],
-        solution: "Well done! Your solution works correctly."
-      };
+      
+      // Create personalized fallback based on actual answer content
+      const answerLength = answerContent.trim().length;
+      const hasSubstantialAnswer = answerLength > 20;
+      
+      if (question.qtype === "Coding") {
+        const hasPassedTests = testResults && testResults.passed > 0;
+        evaluation = {
+          score: baseScore,
+          strengths: hasPassedTests 
+            ? [`Passed ${testResults.passed}/${testResults.total} tests`, "Code compiles successfully"]
+            : hasSubstantialAnswer 
+              ? ["Provided a code solution", "Shows understanding of the problem"]
+              : ["Attempted the problem"],
+          improvements: hasPassedTests 
+            ? ["Fix remaining test cases", "Consider edge cases", "Add error handling"]
+            : ["Review the algorithm logic", "Test with sample inputs", "Debug step by step"],
+          solution: hasPassedTests 
+            ? `You're on the right track! Focus on the ${testResults.total - testResults.passed} failing test cases.`
+            : testResults 
+              ? `No tests passed yet. Review your logic and try running through the examples manually.`
+              : "Make sure your code handles all the requirements mentioned in the problem."
+        };
+      } else {
+        // For behavioral/theory questions
+        evaluation = {
+          score: hasSubstantialAnswer ? 70 : 40,
+          strengths: hasSubstantialAnswer 
+            ? ["Provided a detailed response", "Shows relevant experience"]
+            : ["Attempted to answer the question"],
+          improvements: hasSubstantialAnswer 
+            ? ["Could elaborate on specific examples", "Consider additional perspectives"]
+            : ["Provide more detailed examples", "Expand on your thought process"],
+          solution: hasSubstantialAnswer 
+            ? "Good foundation - adding specific examples would strengthen your answer."
+            : "Try to provide more concrete examples and details to support your points."
+        };
+      }
     }
 
     const feedbackText = quickFeedback

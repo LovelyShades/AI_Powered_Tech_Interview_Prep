@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { MonacoEditor } from './MonacoEditor';
 import { LiveInterviewPanel } from './LiveInterviewPanel';
 import { Question, Answer } from '@/lib/store/sessionStore';
@@ -173,13 +174,14 @@ export const AnswerPanel = ({
         
         {!isSubmitted && (
           <div className="flex justify-end">
-            <button
+            <Button
               onClick={handleSubmitText}
               disabled={!localText.trim()}
-              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
+              variant="gradient"
+              size="lg"
             >
               Submit Answer
-            </button>
+            </Button>
           </div>
         )}
       </CardContent>
