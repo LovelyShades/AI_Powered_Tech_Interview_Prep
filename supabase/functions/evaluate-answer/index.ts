@@ -1,10 +1,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std/http/mod.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface EvaluationRequest {
@@ -14,7 +14,7 @@ interface EvaluationRequest {
     difficulty: string;
     prompt: string;
     expected_answer?: string;
-    tests?: any;
+    tests?: any[];
   };
   userAnswer: {
     rawText?: string;
@@ -33,9 +33,7 @@ interface EvaluationRequest {
 function compileUserFunction(userCode: string, expectedName?: string): Function {
   try {
     return new Function(`"use strict"; return (${userCode});`)();
-  } catch (_) {
-    /* fall through */
-  }
+  } catch (_) {}
 
   const name =
     expectedName ||
@@ -51,9 +49,7 @@ function compileUserFunction(userCode: string, expectedName?: string): Function 
          }
          return ${name};`
       )();
-    } catch (_) {
-      // fall through
-    }
+    } catch (_) {}
   }
 
   try {
@@ -72,30 +68,33 @@ function compileUserFunction(userCode: string, expectedName?: string): Function 
 }
 
 function runTests(userCode: string, tests: any[], timeoutMs: number = 2000) {
+  console.log('=== BACKEND TEST EXECUTION ===');
+  console.log('userCode received:', JSON.stringify(userCode));
+  console.log('tests:', JSON.stringify(tests));
+  
   return new Promise((resolve) => {
     const results: any[] = [];
-
+    
     try {
       const func = compileUserFunction(userCode);
-
-      if (typeof func !== "function") {
-        throw new Error("Compiled code is not a function");
+      if (typeof func !== 'function') {
+        throw new Error(`Expected function, got ${typeof func}.`);
       }
-
+      
       for (const test of tests) {
         try {
           const startTime = Date.now();
           const result = func(...test.input);
           const duration = Date.now() - startTime;
-
+          
           if (duration > timeoutMs) {
             results.push({
               name: test.name,
               passed: false,
               expected: test.expect,
-              actual: "TIMEOUT",
+              actual: 'TIMEOUT',
               input: test.input,
-              error: "Test execution timed out",
+              error: 'Test execution timed out'
             });
           } else {
             const passed = JSON.stringify(result) === JSON.stringify(test.expect);
@@ -104,7 +103,7 @@ function runTests(userCode: string, tests: any[], timeoutMs: number = 2000) {
               passed,
               expected: test.expect,
               actual: result,
-              input: test.input,
+              input: test.input
             });
           }
         } catch (error) {
@@ -114,29 +113,32 @@ function runTests(userCode: string, tests: any[], timeoutMs: number = 2000) {
             expected: test.expect,
             actual: null,
             input: test.input,
-            error: error.message,
+            error: error.message
           });
         }
       }
-
-      const passedCount = results.filter((r) => r.passed).length;
-      resolve({
+      
+      const passedCount = results.filter(r => r.passed).length;
+      const finalResult = {
         passed: passedCount,
         total: results.length,
-        details: results,
-      });
+        details: results
+      };
+      
+      resolve(finalResult);
     } catch (error) {
-      resolve({
+      const errorResult = {
         passed: 0,
         total: tests.length,
-        details: tests.map((t) => ({
-          name: t.name,
-          passed: false,
-          input: t.input,
-          expect: t.expect,
-          error: `Failed to initialize test runner: ${error.message}`,
-        })),
-      });
+        details: tests.map(t => ({ 
+          name: t.name, 
+          passed: false, 
+          input: t.input, 
+          expect: t.expect, 
+          error: `Failed to initialize test runner: ${error.message}` 
+        }))
+      };
+      resolve(errorResult);
     }
   });
 }
@@ -147,27 +149,38 @@ serve(async (req) => {
   }
 
   try {
-    const { question, userAnswer, quickFeedback }: EvaluationRequest =
-      await req.json();
+    const { question, userAnswer, quickFeedback }: EvaluationRequest = await req.json();
 
-    const openAIApiKey = Deno.env.get("OPENAI_API_KEY") || "";
+    const openAIApiKey = (globalThis as any).OPENAI_API_KEY || "";
     if (!openAIApiKey) throw new Error("OpenAI API key not found");
 
-    const answerContent =
-      userAnswer.rawText || userAnswer.code || userAnswer.transcript || "";
+    const answerContent = userAnswer.rawText || userAnswer.code || userAnswer.transcript || "";
     if (!answerContent.trim()) throw new Error("No answer content provided");
 
-    let testResults = { passed: 0, total: 0, details: [] };
-    let baseScore = 50;
+    let testResults: { passed: number; total: number; details: any[] } = { passed: 0, total: 0, details: [] };
+    let baseScore = 0;
 
-    if (question.qtype === "Coding" && userAnswer.testResults) {
-      const frontendResults = userAnswer.testResults;
-      testResults = {
-        passed: typeof frontendResults.passed === "number" ? frontendResults.passed : 0,
-        total: typeof frontendResults.total === "number" ? frontendResults.total : 0,
-        details: Array.isArray(frontendResults.details) ? frontendResults.details : [],
-      };
-      baseScore = typeof frontendResults.score === "number" ? frontendResults.score : baseScore;
+    if (question.qtype === "Coding") {
+      if (userAnswer.testResults && userAnswer.testResults.total > 0) {
+        // Use frontend test results if present and valid
+        const frontendResults = userAnswer.testResults;
+        testResults = {
+          passed: typeof frontendResults.passed === "number" ? frontendResults.passed : 0,
+          total: typeof frontendResults.total === "number" ? frontendResults.total : 0,
+          details: Array.isArray(frontendResults.details) ? frontendResults.details : []
+        };
+        baseScore = typeof frontendResults.score === "number" ? frontendResults.score : 0;
+      } else if (userAnswer.code && question.tests && question.tests.length > 0) {
+        // Run backend tests if frontend results missing or invalid
+        testResults = await runTests(userAnswer.code, question.tests) as { passed: number; total: number; details: any[] };
+        baseScore = testResults.total > 0
+          ? Math.round((testResults.passed / testResults.total) * 100)
+          : 0;
+      } else {
+        baseScore = 0;
+      }
+    } else {
+      baseScore = 50;
     }
 
     const prompt = `Evaluate this ${question.qtype} interview answer:
@@ -177,34 +190,31 @@ ${question.prompt}
 
 ${question.expected_answer ? `Expected approach: ${question.expected_answer}` : ""}
 
-IMPORTANT: The following is the candidate's ACTUAL ANSWER:
+Candidate answer:
 "${answerContent}"
 
-CRITICAL: Only evaluate what the user actually said/wrote.
-Do NOT assume they said anything from the question prompt or expected answer.
+Test results: Passed ${testResults.passed} out of ${testResults.total} tests.
 
-Provide evaluation as JSON:
+IMPORTANT: If the answer is incorrect or incomplete, deduct points accordingly and mention the mistakes explicitly.
+
+Provide a numeric score out of 100.
+
+Return ONLY JSON in the following format:
 {
-  "score": ${baseScore},
-  "strengths": ["point 1", "point 2"],
-  "improvements": ["point 1", "point 2"],
-  "solution": "Brief canonical solution (max 150 words)"
-}`;
+  "score": number,
+  "strengths": [string],
+  "improvements": [string],
+  "solution": string
+}
+`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${openAIApiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${openAIApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "gpt-5-2025-08-07",
         messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert technical interviewer. Provide fair, constructive feedback.",
-          },
+          { role: "system", content: "You are an expert technical interviewer. Provide fair, constructive feedback." },
           { role: "user", content: prompt },
         ],
         max_tokens: 500,
@@ -216,28 +226,39 @@ Provide evaluation as JSON:
       throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      throw new Error(`Invalid JSON response from OpenAI: ${responseText.substring(0, 200)}`);
+    }
 
     let evaluation;
     try {
       evaluation = JSON.parse(data.choices[0].message.content);
-    } catch (_) {
+    } catch (e) {
+      // Neutral fallback evaluation if JSON parsing fails
       evaluation = {
-        score: baseScore,
-        strengths: ["Code runs successfully", "Correct logic implementation"],
-        improvements: ["Consider edge cases", "Add more detailed comments"],
-        solution: "Well done! Your solution works correctly.",
+        score: 0,
+        strengths: [],
+        improvements: ["Answer could not be evaluated properly."],
+        solution: "Solution not available."
       };
     }
 
     const feedbackText = quickFeedback
-      ? `**Strengths:**\n${evaluation.strengths.map((s: string) => `• ${s}`).join("\n")}
+      ? `
+**Strengths:**
+${evaluation.strengths.map((s: string) => `• ${s}`).join("\n")}
 
-**Areas for improvement:**\n${evaluation.improvements.map((i: string) => `• ${i}`).join("\n")}`
+**Areas for improvement:**
+${evaluation.improvements.map((i: string) => `• ${i}`).join("\n")}
+`.trim()
       : "";
 
     const result = {
-      score: evaluation.score || baseScore,
+      score: evaluation.score ?? baseScore,
       quickFeedbackText: feedbackText,
       finalFeedbackText: feedbackText,
       solutionSnapshot: evaluation.solution || "Solution not available",
@@ -248,6 +269,7 @@ Provide evaluation as JSON:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
+    console.error("Evaluation error:", error);
     return new Response(
       JSON.stringify({
         error: error.message,
