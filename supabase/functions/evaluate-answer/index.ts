@@ -1,5 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,7 +13,7 @@ interface EvaluationRequest {
     difficulty: string;
     prompt: string;
     expected_answer?: string;
-    tests?: any[];
+    tests?: any;
   };
   userAnswer: {
     rawText?: string;
@@ -30,13 +30,18 @@ interface EvaluationRequest {
 }
 
 function compileUserFunction(userCode: string, expectedName?: string): Function {
+  // 1) Try as an expression  — e.g. "(a,b)=>{...}" or "(function(a,b){...})"
   try {
     return new Function(`"use strict"; return (${userCode});`)();
-  } catch (_) {}
+  } catch (_) {
+    /* fall through */
+  }
 
+  // 2) Try as a declaration and return a known name (e.g., mergeTwoLists)
+  //    Wrap user code in a function scope and return the named function.
   const name =
     expectedName ||
-    (userCode.match(/function\\s+([A-Za-z_$][\\w$]*)\\s*\\(/)?.[1] ?? null);
+    (userCode.match(/function\s+([A-Za-z_$][\w$]*)\s*\(/)?.[1] ?? null);
 
   if (name) {
     try {
@@ -48,72 +53,115 @@ function compileUserFunction(userCode: string, expectedName?: string): Function 
          }
          return ${name};`
       )();
-    } catch (_) {}
+    } catch (e) {
+      // continue to next fallback
+    }
   }
+
+  // 3) Last-resort: try to grab the first declared function automatically
+  try {
+    return new Function(
+      `"use strict";
+       ${userCode}
+       // Scan for function names and return the first one found
+       const funcMatch = ${JSON.stringify(userCode)}.match(/function\\s+([A-Za-z_$][\\w$]*)\\s*\\(/);
+       if (funcMatch && typeof this[funcMatch[1]] === "function") {
+         return this[funcMatch[1]];
+       }
+       throw new Error("No function found");`
+    )();
+  } catch {}
 
   throw new Error("Could not compile user code into a callable function");
 }
 
+// Use direct execution (same as frontend CodeRunner)  
 function runTests(userCode: string, tests: any[], timeoutMs: number = 2000) {
+  console.log('=== BACKEND TEST EXECUTION ===');
+  console.log('userCode received:', JSON.stringify(userCode));
+  console.log('userCode length:', userCode.length);
+  console.log('tests:', JSON.stringify(tests));
+  console.log('timeoutMs:', timeoutMs);
+  
   return new Promise((resolve) => {
-    const results: any[] = [];
+    const results = [];
+    
     try {
+      // Use robust function compilation approach
+      console.log('Creating function using robust approach');
       const func = compileUserFunction(userCode);
-      if (typeof func !== "function") {
-        throw new Error(`Expected function, got ${typeof func}.`);
+      console.log('Function created successfully, type:', typeof func);
+      
+      if (typeof func !== 'function') {
+        throw new Error(`Expected function, got ${typeof func}. Code: ${userCode.substring(0, 100)}`);
       }
-
+      
       for (const test of tests) {
         try {
+          console.log(`Running test "${test.name}" with input:`, JSON.stringify(test.input));
           const startTime = Date.now();
           const result = func(...test.input);
           const duration = Date.now() - startTime;
-
+          console.log(`Test "${test.name}" result:`, JSON.stringify(result), 'duration:', duration);
+          
           if (duration > timeoutMs) {
             results.push({
               name: test.name,
               passed: false,
               expected: test.expect,
-              actual: "TIMEOUT",
+              actual: 'TIMEOUT',
               input: test.input,
-              error: "Test execution timed out",
+              error: 'Test execution timed out'
             });
           } else {
             const passed = JSON.stringify(result) === JSON.stringify(test.expect);
+            console.log(`Test "${test.name}" passed:`, passed, 'expected:', JSON.stringify(test.expect));
             results.push({
               name: test.name,
               passed,
               expected: test.expect,
               actual: result,
-              input: test.input,
+              input: test.input
             });
           }
         } catch (error) {
+          console.log(`Test "${test.name}" execution error:`, error.message);
           results.push({
             name: test.name,
             passed: false,
             expected: test.expect,
             actual: null,
             input: test.input,
-            error: error.message,
+            error: error.message
           });
         }
       }
-
-      const passedCount = results.filter((r) => r.passed).length;
-      resolve({ passed: passedCount, total: results.length, details: results });
+      
+      const passedCount = results.filter(r => r.passed).length;
+      const finalResult = {
+        passed: passedCount,
+        total: results.length,
+        details: results
+      };
+      
+      console.log('Final test results:', JSON.stringify(finalResult));
+      resolve(finalResult);
     } catch (error) {
-      resolve({
+      console.error('Function creation failed:', error.message);
+      console.error('Code that failed:', JSON.stringify(userCode));
+      const errorResult = {
         passed: 0,
         total: tests.length,
-        details: tests.map((t) => ({
-          name: t.name,
-          passed: false,
-          input: t.input,
-          expect: t.expect,
-          error: `Failed to initialize test runner: ${error.message}`,
-        })),
-      });
+        details: tests.map(t => ({ 
+          name: t.name, 
+          passed: false, 
+          input: t.input, 
+          expect: t.expect, 
+          error: `Failed to initialize test runner: ${error.message}` 
+        }))
+      };
+      console.log('Returning error result:', JSON.stringify(errorResult));
+      resolve(errorResult);
     }
   });
 }
@@ -130,109 +178,166 @@ serve(async (req) => {
     if (!openAIApiKey) throw new Error("OpenAI API key not found");
 
     const answerContent = userAnswer.rawText || userAnswer.code || userAnswer.transcript || "";
-    if (!answerContent.trim()) {
-      return new Response(
-        JSON.stringify({
-          score: 0,
-          quickFeedbackText: "",
-          finalFeedbackText: "No answer provided.",
-          solutionSnapshot: "Solution not available",
-          testResults: { passed: 0, total: 0, details: [] },
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
+    if (!answerContent.trim()) throw new Error("No answer content provided");
 
-    let testResults = { passed: 0, total: 0, details: [] };
-    let baseScore = 0;
+    console.log("Evaluating answer:", {
+      questionTitle: question.title,
+      type: question.qtype,
+      source: userAnswer.rawText ? "text" : userAnswer.code ? "code" : "transcript",
+    });
 
-    if (question.qtype === "Coding") {
-      if (userAnswer.testResults && userAnswer.testResults.total > 0) {
-        testResults = {
-          passed: userAnswer.testResults.passed,
-          total: userAnswer.testResults.total,
-          details: userAnswer.testResults.details,
-        };
-        baseScore = userAnswer.testResults.score;
-      } else if (userAnswer.code && question.tests && question.tests.length > 0) {
-        testResults = (await runTests(userAnswer.code, question.tests)) as {
-          passed: number;
-          total: number;
-          details: any[];
-        };
-        baseScore =
-          testResults.total > 0
-            ? Math.round((testResults.passed / testResults.total) * 100)
-            : 0;
-      }
+    let testResults = null;
+    let baseScore = 50;
+
+    console.log("Checking for test results...");
+    console.log("Question type:", question.qtype);
+    console.log("User answer keys:", Object.keys(userAnswer));
+    console.log("Test results in userAnswer:", userAnswer.testResults);
+
+    // Use test results from frontend instead of running tests again
+    if (question.qtype === "Coding" && userAnswer.testResults) {
+      console.log("Using frontend test results");
+      const frontendResults = userAnswer.testResults;
+      
+      testResults = {
+        passed: frontendResults.summary?.passed || 0,
+        total: frontendResults.summary?.total || 0,
+        details: frontendResults.results || []
+      };
+      baseScore = frontendResults.summary?.score || 0;
+      
+      console.log("Processed test results:", {
+        passed: testResults.passed,
+        total: testResults.total,
+        score: baseScore,
+        details: testResults.details
+      });
     } else {
-      baseScore = 50;
+      console.log("No test results found or not a coding question");
     }
 
-    const prompt = `Evaluate this ${question.qtype} interview answer:
+    // Create a more focused prompt based on question type
+    let evaluationPrompt = "";
+    if (question.qtype === "Coding") {
+      evaluationPrompt = `Evaluate this coding interview answer with test results:
 
 Question: ${question.title} (${question.difficulty})
-${question.prompt}
+User's Answer: "${answerContent}"
 
-${question.expected_answer ? `Expected approach: ${question.expected_answer}` : ""}
+Test Results: ${testResults ? `${testResults.passed}/${testResults.total} tests passed` : 'No tests available'}
 
-Candidate answer:
-"${answerContent}"
-
-Test results: Passed ${testResults.passed} out of ${testResults.total} tests.
-
-IMPORTANT:
-- Only judge what the candidate actually wrote/said.
-- Do not invent missing details.
-- If the answer is weak, incomplete, or wrong, lower the score and be specific.
-- Do not give praise unless it is clearly earned.
-
-Return ONLY valid JSON:
+Provide honest evaluation as JSON:
 {
-  "score": number,
-  "strengths": [string],
-  "improvements": [string],
-  "solution": string
+  "score": ${baseScore},
+  "strengths": ["specific positive points about their approach"],
+  "improvements": ["specific areas needing work"],
+  "solution": "Brief explanation of what could be improved"
 }`;
+    } else {
+      evaluationPrompt = `Evaluate this ${question.qtype} interview answer:
+
+Question: ${question.title} (${question.difficulty})
+Prompt: ${question.prompt}
+
+Candidate's Answer: "${answerContent}"
+
+Provide detailed, personalized evaluation as JSON:
+{
+  "score": 75,
+  "strengths": ["specific good points from their answer"],
+  "improvements": ["specific areas to enhance based on their response"],
+  "solution": "Additional insights or better approach they could consider"
+}`;
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${openAIApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4.1-2025-04-14",
         messages: [
-          {
-            role: "system",
-            content: "You are an expert technical interviewer. Be neutral, fair, and constructive.",
+          { 
+            role: "system", 
+            content: "You are an experienced technical interviewer. Provide honest, specific, and constructive feedback. Always respond with valid JSON only." 
           },
-          { role: "user", content: prompt },
+          { role: "user", content: evaluationPrompt },
         ],
-        max_tokens: 500,
-        temperature: 0.2,
+        max_tokens: 800,
+        temperature: 0.7,
       }),
     });
 
+    console.log("OpenAI response status:", response.status);
+    console.log("OpenAI response headers:", Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
       const errorText = await response.text();
+      console.error("OpenAI API error:", response.status, errorText);
       throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
+    
+    const responseText = await response.text();
+    console.log("Raw OpenAI response:", responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error("Failed to parse OpenAI response as JSON:", e.message);
+      throw new Error(`Invalid JSON response from OpenAI: ${responseText.substring(0, 200)}`);
+    }
 
-    const data = await response.json();
     let evaluation;
     try {
-      evaluation = JSON.parse(data.choices[0].message.content);
-    } catch {
-      // Neutral fallback based on actual test results
-      evaluation = {
-        score: testResults.total > 0
-          ? Math.round((testResults.passed / testResults.total) * 100)
-          : 0,
-        strengths: testResults.passed > 0 ? ["Some tests passed."] : [],
-        improvements: testResults.passed === 0
-          ? ["No tests passed. Review your logic and syntax carefully."]
-          : ["Answer could not be fully evaluated. Add clarity and handle edge cases."],
-        solution: "Canonical solution not available due to evaluation error.",
-      };
+      const content = data.choices[0].message.content.trim();
+      console.log("AI Response content:", content);
+      
+      if (!content) {
+        throw new Error("Empty response from AI");
+      }
+      
+      evaluation = JSON.parse(content);
+    } catch (e) {
+      console.error("Failed to parse evaluation JSON:", e.message);
+      console.error("Raw content:", data.choices[0].message.content);
+      
+      // Create personalized fallback based on actual answer content
+      const answerLength = answerContent.trim().length;
+      const hasSubstantialAnswer = answerLength > 20;
+      
+      if (question.qtype === "Coding") {
+        const hasPassedTests = testResults && testResults.passed > 0;
+        evaluation = {
+          score: baseScore,
+          strengths: hasPassedTests 
+            ? [`Passed ${testResults.passed}/${testResults.total} tests`, "Code compiles successfully"]
+            : hasSubstantialAnswer 
+              ? ["Provided a code solution", "Shows understanding of the problem"]
+              : ["Attempted the problem"],
+          improvements: hasPassedTests 
+            ? ["Fix remaining test cases", "Consider edge cases", "Add error handling"]
+            : ["Review the algorithm logic", "Test with sample inputs", "Debug step by step"],
+          solution: hasPassedTests 
+            ? `You're on the right track! Focus on the ${testResults.total - testResults.passed} failing test cases.`
+            : testResults 
+              ? `No tests passed yet. Review your logic and try running through the examples manually.`
+              : "Make sure your code handles all the requirements mentioned in the problem."
+        };
+      } else {
+        // For behavioral/theory questions
+        evaluation = {
+          score: hasSubstantialAnswer ? 70 : 40,
+          strengths: hasSubstantialAnswer 
+            ? ["Provided a detailed response", "Shows relevant experience"]
+            : ["Attempted to answer the question"],
+          improvements: hasSubstantialAnswer 
+            ? ["Could elaborate on specific examples", "Consider additional perspectives"]
+            : ["Provide more detailed examples", "Expand on your thought process"],
+          solution: hasSubstantialAnswer 
+            ? "Good foundation - adding specific examples would strengthen your answer."
+            : "Try to provide more concrete examples and details to support your points."
+        };
+      }
     }
 
     const feedbackText = quickFeedback
@@ -245,16 +350,17 @@ ${evaluation.improvements.map((i: string) => `• ${i}`).join("\n")}
 `.trim()
       : "";
 
-    return new Response(
-      JSON.stringify({
-        score: typeof evaluation.score === "number" ? evaluation.score : baseScore,
-        quickFeedbackText: feedbackText,
-        finalFeedbackText: feedbackText,
-        solutionSnapshot: evaluation.solution || "Solution not available",
-        testResults,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    const result = {
+      score: evaluation.score || baseScore,
+      quickFeedbackText: feedbackText,
+      finalFeedbackText: feedbackText,
+      solutionSnapshot: evaluation.solution || "Solution not available",
+      testResults,
+    };
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Evaluation error:", error);
     return new Response(
