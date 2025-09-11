@@ -54,6 +54,7 @@ interface SessionState {
   submitAnswer: (questionId: string, answer: Answer) => Promise<void>;
   startTimer: () => void;
   reset: () => void;
+  clearSession: () => void;
 }
 
 const defaultSettings: SessionSettings = {
@@ -149,5 +150,17 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     currentIndex: 0,
     answersByQuestionId: {},
     timeStarted: null
-  })
+  }),
+
+  // Clear session data completely including localStorage
+  clearSession: () => {
+    localStorage.removeItem('currentSessionQuestions');
+    set({
+      sessionId: null,
+      questions: [],
+      currentIndex: 0,
+      answersByQuestionId: {},
+      timeStarted: null
+    });
+  }
 }));

@@ -181,9 +181,9 @@ export type Database = {
     Functions: {
       get_questions_for_session: {
         Args: {
-          p_category: Database["public"]["Enums"]["app_category"]
+          p_category?: Database["public"]["Enums"]["app_category"]
           p_difficulty: Database["public"]["Enums"]["difficulty_level"]
-          p_limit: number
+          p_limit?: number
         }
         Returns: {
           difficulty: Database["public"]["Enums"]["difficulty_level"]
@@ -231,7 +231,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_category: "software" | "cloud" | "data" | "ai" | "cyber"
+      app_category:
+        | "software_engineering"
+        | "frontend_ui"
+        | "ai_ml"
+        | "cloud_devops"
+        | "database_data"
+        | "it_systems"
+        | "security_cyber"
       difficulty_level: "Easy" | "Medium" | "Hard"
       difficulty_t: "Easy" | "Medium" | "Hard"
       qtype_t: "Coding" | "Concept" | "Behavioral"
@@ -368,7 +375,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_category: ["software", "cloud", "data", "ai", "cyber"],
+      app_category: [
+        "software_engineering",
+        "frontend_ui",
+        "ai_ml",
+        "cloud_devops",
+        "database_data",
+        "it_systems",
+        "security_cyber",
+      ],
       difficulty_level: ["Easy", "Medium", "Hard"],
       difficulty_t: ["Easy", "Medium", "Hard"],
       qtype_t: ["Coding", "Concept", "Behavioral"],
