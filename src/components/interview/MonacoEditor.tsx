@@ -146,37 +146,43 @@ export const MonacoEditor = ({
       </div>
       
       {!readOnly && (
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRunTests}
-            disabled={isSubmitted || isRunning}
-          >
-            <Play className="h-4 w-4 mr-2" />
-            {isRunning ? 'Running...' : 'Run Tests (⌘/Ctrl+Enter)'}
-          </Button>
-          
-          {!isSubmitted && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <div className="flex gap-2 flex-1">
             <Button 
-              variant="default" 
+              variant="gradient" 
               size="sm" 
-              onClick={handleSubmit}
-              disabled={isRunning}
+              onClick={handleRunTests}
+              disabled={isSubmitted || isRunning}
+              className="flex-1 sm:flex-none"
             >
-              Submit Answer
+              <Play className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">{isRunning ? 'Running...' : 'Run Tests (⌘+Enter)'}</span>
+              <span className="sm:hidden">{isRunning ? 'Running...' : 'Run'}</span>
             </Button>
-          )}
+            
+            {!isSubmitted && (
+              <Button 
+                variant="gradient" 
+                size="sm" 
+                onClick={handleSubmit}
+                disabled={isRunning}
+                className="flex-1 sm:flex-none"
+              >
+                <span className="hidden sm:inline">Submit Answer</span>
+                <span className="sm:hidden">Submit</span>
+              </Button>
+            )}
+          </div>
           
           {/* Test Results Preview */}
           {testResults.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary">
+            <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 sm:mt-0">
+              <Badge variant="secondary" className="text-xs">
                 <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
                 {testResults.filter(r => r.passed).length} passed
               </Badge>
               {testResults.some(r => !r.passed) && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="text-xs">
                   <XCircle className="h-3 w-3 mr-1 text-red-600" />
                   {testResults.filter(r => !r.passed).length} failed
                 </Badge>
