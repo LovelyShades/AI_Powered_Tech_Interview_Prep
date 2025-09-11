@@ -51,18 +51,6 @@ function compileUserFunction(userCode: string, expectedName?: string): Function 
     } catch (_) {}
   }
 
-  try {
-    return new Function(
-      `"use strict";
-       ${userCode}
-       const funcMatch = ${JSON.stringify(userCode)}.match(/function\\s+([A-Za-z_$][\\w$]*)\\s*\\(/);
-       if (funcMatch && typeof this[funcMatch[1]] === "function") {
-         return this[funcMatch[1]];
-       }
-       throw new Error("No function found");`
-    )();
-  } catch {}
-
   throw new Error("Could not compile user code into a callable function");
 }
 
@@ -74,6 +62,7 @@ function runTests(userCode: string, tests: any[], timeoutMs: number = 2000) {
       if (typeof func !== "function") {
         throw new Error(`Expected function, got ${typeof func}.`);
       }
+
       for (const test of tests) {
         try {
           const startTime = Date.now();
@@ -110,6 +99,7 @@ function runTests(userCode: string, tests: any[], timeoutMs: number = 2000) {
           });
         }
       }
+
       const passedCount = results.filter((r) => r.passed).length;
       resolve({ passed: passedCount, total: results.length, details: results });
     } catch (error) {
@@ -195,7 +185,7 @@ IMPORTANT:
 - Only judge what the candidate actually wrote/said.
 - Do not invent missing details.
 - If the answer is weak, incomplete, or wrong, lower the score and be specific.
-- Do not give praise unless it is earned.
+- Do not give praise unless it is clearly earned.
 
 Return ONLY valid JSON:
 {
@@ -232,11 +222,16 @@ Return ONLY valid JSON:
     try {
       evaluation = JSON.parse(data.choices[0].message.content);
     } catch {
+      // Neutral fallback based on actual test results
       evaluation = {
-        score: baseScore,
-        strengths: [],
-        improvements: ["Answer could not be fully evaluated."],
-        solution: "Canonical solution not available.",
+        score: testResults.total > 0
+          ? Math.round((testResults.passed / testResults.total) * 100)
+          : 0,
+        strengths: testResults.passed > 0 ? ["Some tests passed."] : [],
+        improvements: testResults.passed === 0
+          ? ["No tests passed. Review your logic and syntax carefully."]
+          : ["Answer could not be fully evaluated. Add clarity and handle edge cases."],
+        solution: "Canonical solution not available due to evaluation error.",
       };
     }
 
