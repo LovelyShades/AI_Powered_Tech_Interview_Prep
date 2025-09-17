@@ -47,7 +47,28 @@
     --code-foreground: 210 40% 98%;
     --code-accent: 267 84% 81%;
     
-    /* Sidebar */
+/* Mobile-specific styles to prevent auto-zoom */
+input, textarea, select {
+  font-size: 16px !important;
+  transform-origin: left top;
+  transform: scale(1);
+}
+
+/* Prevent zoom on focus for mobile */
+@media screen and (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Monaco editor mobile optimizations */
+  .monaco-editor {
+    touch-action: pan-x pan-y;
+  }
+  
+  .monaco-editor .view-lines {
+    touch-action: pan-x pan-y;
+  }
+}
     --sidebar-background: 222 84% 5%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 217 91% 60%;

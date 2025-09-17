@@ -125,7 +125,7 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${openAIApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4.1-mini", // adjust if needed
+        model: "gpt-4o-mini", // correct model name
         messages: [
           {
             role: "system",

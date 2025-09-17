@@ -67,17 +67,18 @@ export class CodeRunner {
                 results.push({
                   name: test.name,
                   passed: false,
-                  expected: test.expect,
+                  expected: test.expect || test.expected,
                   actual: 'TIMEOUT',
                   input: test.input,
                   error: 'Test execution timed out'
                 });
               } else {
-                const passed = JSON.stringify(result) === JSON.stringify(test.expect);
+                const expected = test.expect || test.expected;
+                const passed = JSON.stringify(result) === JSON.stringify(expected);
                 results.push({
                   name: test.name,
                   passed,
-                  expected: test.expect,
+                  expected,
                   actual: result,
                   input: test.input
                 });
@@ -86,7 +87,7 @@ export class CodeRunner {
               results.push({
                 name: test.name,
                 passed: false,
-                expected: test.expect,
+                expected: test.expect || test.expected,
                 actual: null,
                 input: test.input,
                 error: error.message

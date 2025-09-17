@@ -1,7 +1,5 @@
 // supabase/functions/realtime-interview/index.ts
-import { serve } from "https://deno.land/std/http/server.ts";
-// @ts-ignore: Deno global is available in Deno runtime
-declare const Deno: typeof globalThis.Deno;
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

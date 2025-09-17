@@ -226,7 +226,7 @@ export type Database = {
               p_limit: number
             }
         Returns: {
-          qid: number
+          question_id: number
         }[]
       }
     }

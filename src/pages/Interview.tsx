@@ -244,16 +244,16 @@ const Interview = () => {
         <header className="border-b border-blue-200/30 bg-white/80 backdrop-blur-md shadow-xl">
         <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
           <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
-            {/* Left: Exit */}
+            {/* Left: Exit - Mobile optimized */}
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-slate-600 hover:text-slate-800 hover:bg-blue-100/50 text-xs sm:text-sm px-2 sm:px-4"
+              className="text-slate-600 hover:text-slate-800 hover:bg-blue-100/50 text-xs sm:text-sm px-1 sm:px-4"
               onClick={handleExitInterview}
             >
-              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Exit Interview</span>
-              <span className="sm:hidden">Exit</span>
+              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-0 sm:mr-2" />
+              <span className="hidden md:inline">Exit Interview</span>
+              <span className="md:hidden sr-only">Exit</span>
             </Button>
             
             {/* Center: Progress */}
@@ -266,22 +266,22 @@ const Interview = () => {
               <Progress value={progress} className="h-1.5 sm:h-2 bg-blue-100" />
             </div>
             
-            {/* Right: Timer & Next */}
+            {/* Right: Timer & Next - Mobile optimized */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
-              <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-slate-700 bg-blue-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-slate-700 bg-blue-50 px-1 sm:px-3 py-1 sm:py-1.5 rounded-lg">
                 <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
-                <span className="tabular-nums">{timeRemaining}</span>
+                <span className="tabular-nums text-xs sm:text-sm">{timeRemaining}</span>
               </div>
               {!isSubmitted && (
                 <Button 
                   size="sm" 
                   onClick={handleNext} 
                   variant="gradient"
-                  className="text-xs sm:text-sm px-2 sm:px-4"
+                  className="text-xs px-1 sm:px-4"
                 >
-                  <span className="hidden sm:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Skip'}</span>
-                  <span className="sm:hidden">{currentIndex === questions.length - 1 ? 'End' : 'Skip'}</span>
-                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                  <span className="hidden md:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Skip'}</span>
+                  <span className="md:hidden">{currentIndex === questions.length - 1 ? 'End' : 'Skip'}</span>
+                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-0 sm:ml-2" />
                 </Button>
               )}
               {isSubmitted && (
@@ -289,11 +289,11 @@ const Interview = () => {
                   size="sm" 
                   onClick={handleNext} 
                   variant="gradient"
-                  className="text-xs sm:text-sm px-2 sm:px-4"
+                  className="text-xs px-1 sm:px-4"
                 >
-                  <span className="hidden sm:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Next'}</span>
-                  <span className="sm:hidden">{currentIndex === questions.length - 1 ? 'End' : 'Next'}</span>
-                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                  <span className="hidden md:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Next'}</span>
+                  <span className="md:hidden">{currentIndex === questions.length - 1 ? 'End' : 'Next'}</span>
+                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-0 sm:ml-2" />
                 </Button>
               )}
             </div>

@@ -1,14 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Read from Vite env (must be defined in .env or Vercel dashboard)
+// Read from Vite env (must be defined in .env or in your Vercel project settings)
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error("Missing Supabase environment variables. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+  throw new Error(
+    "Missing Supabase environment variables. Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set."
+  );
 }
 
-// Create a typed client (if you have Database types, import them)
+// Create Supabase client
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: true,
