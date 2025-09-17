@@ -84,6 +84,12 @@ export const MonacoEditor = ({
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+    // Force editor layout after fullscreen toggle
+    setTimeout(() => {
+      if (editorRef.current) {
+        editorRef.current.layout();
+      }
+    }, 100);
   };
 
   const handleLanguageChange = (newLanguage: string) => {
@@ -101,9 +107,21 @@ export const MonacoEditor = ({
     if (isFullscreen) {
       document.addEventListener('keydown', handleEscapeKey);
       document.body.style.overflow = 'hidden';
+      // Force layout after going fullscreen
+      setTimeout(() => {
+        if (editorRef.current) {
+          editorRef.current.layout();
+        }
+      }, 200);
     } else {
       document.removeEventListener('keydown', handleEscapeKey);
       document.body.style.overflow = 'auto';
+      // Force layout after exiting fullscreen
+      setTimeout(() => {
+        if (editorRef.current) {
+          editorRef.current.layout();
+        }
+      }, 200);
     }
 
     return () => {

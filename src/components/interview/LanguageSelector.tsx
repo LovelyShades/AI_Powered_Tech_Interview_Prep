@@ -20,6 +20,9 @@ const languages: Language[] = [
   { id: "sql", name: "SQL", icon: <Database className="h-3 w-3" />, color: "bg-green-500" },
 ];
 
+// Only JavaScript is currently available
+const availableLanguages = ["javascript"];
+
 interface LanguageSelectorProps {
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
@@ -35,34 +38,39 @@ export const LanguageSelector = ({
 
   return (
     <div className="flex items-center gap-2 mb-4">
-      <div className="flex items-center gap-2">
-        <Badge 
-          variant="secondary" 
-          className="flex items-center gap-1 text-xs font-medium"
-        >
-          {selectedLanguage.icon}
-          <span>{selectedLanguage.name}</span>
-        </Badge>
-      </div>
-      
       <Select
         value={currentLanguage}
         onValueChange={onLanguageChange}
         disabled={disabled}
       >
-        <SelectTrigger className="w-[140px] h-8 text-xs">
-          <SelectValue placeholder="Change language" />
+        <SelectTrigger className="w-[160px] h-9 text-sm">
+          <SelectValue>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${selectedLanguage.color}`} />
+              {selectedLanguage.icon}
+              <span>{selectedLanguage.name}</span>
+            </div>
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {languages.map((language) => (
-            <SelectItem key={language.id} value={language.id}>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${language.color}`} />
-                {language.icon}
-                <span>{language.name}</span>
-              </div>
-            </SelectItem>
-          ))}
+          {languages.map((language) => {
+            const isAvailable = availableLanguages.includes(language.id);
+            return (
+              <SelectItem 
+                key={language.id} 
+                value={language.id}
+                disabled={!isAvailable}
+                className={!isAvailable ? "opacity-50 cursor-not-allowed" : ""}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${language.color}`} />
+                  {language.icon}
+                  <span>{language.name}</span>
+                  {!isAvailable && <span className="text-xs text-muted-foreground">(Coming Soon)</span>}
+                </div>
+              </SelectItem>
+            );
+          })}
         </SelectContent>
       </Select>
     </div>

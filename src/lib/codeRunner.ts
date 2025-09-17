@@ -73,8 +73,10 @@ export class CodeRunner {
                   error: 'Test execution timed out'
                 });
               } else {
-                const expected = test.expect || test.expected;
-                const passed = JSON.stringify(result) === JSON.stringify(expected);
+                const expected = test.expect !== undefined ? test.expect : test.expected;
+                // Don't pass tests if expected value is null, undefined, or empty string
+                const hasValidExpected = expected !== null && expected !== undefined && expected !== '';
+                const passed = hasValidExpected && JSON.stringify(result) === JSON.stringify(expected);
                 results.push({
                   name: test.name,
                   passed,
