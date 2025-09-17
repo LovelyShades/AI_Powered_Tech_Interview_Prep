@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
-import { AnimatedBackground } from "@/components/effects/AnimatedBackground";
 import { QuestionPanel } from "@/components/interview/QuestionPanel";
 import { AnswerPanel } from "@/components/interview/AnswerPanel";
 import { FeedbackPanel } from "@/components/interview/FeedbackPanel";
@@ -194,15 +193,11 @@ const Interview = () => {
 
   if (!currentQuestion && questions.length === 0) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
-        <AnimatedBackground />
-        <div className="fixed inset-0 bg-gradient-to-br from-slate-50/95 via-blue-50/90 to-purple-50/95 z-10" />
-        <div className="relative z-30 flex items-center justify-center min-h-screen">
-          <div className="text-center bg-white/80 backdrop-blur-md rounded-2xl p-8 border border-blue-200/50 shadow-xl">
-            <h2 className="text-2xl font-bold mb-2 text-slate-800">Loading interview...</h2>
-            <p className="text-slate-600">Please wait while we prepare your questions.</p>
-            <p className="text-sm text-slate-500 mt-2">Session ID: {sessionId}</p>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center bg-card rounded-2xl p-8 border shadow-lg max-w-md mx-4">
+          <h2 className="text-2xl font-bold mb-2 text-foreground">Loading interview...</h2>
+          <p className="text-muted-foreground">Please wait while we prepare your questions.</p>
+          <p className="text-sm text-muted-foreground mt-2">Session ID: {sessionId}</p>
         </div>
       </div>
     );
@@ -210,45 +205,35 @@ const Interview = () => {
 
   if (!currentQuestion && questions.length > 0) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
-        <AnimatedBackground />
-        <div className="fixed inset-0 bg-gradient-to-br from-slate-50/95 via-blue-50/90 to-purple-50/95 z-10" />
-        <div className="relative z-30 flex items-center justify-center min-h-screen">
-          <div className="text-center bg-white/80 backdrop-blur-md rounded-2xl p-8 border border-blue-200/50 shadow-xl">
-            <h2 className="text-2xl font-bold mb-2 text-slate-800">Question not found</h2>
-            <p className="text-slate-600">Current index: {currentIndex}, Total questions: {questions.length}</p>
-            <Button 
-              onClick={() => setCurrentIndex(0)}
-              variant="gradient"
-              className="mt-4"
-            >
-              Reset to first question
-            </Button>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center bg-card rounded-2xl p-8 border shadow-lg max-w-md mx-4">
+          <h2 className="text-2xl font-bold mb-2 text-foreground">Question not found</h2>
+          <p className="text-muted-foreground">Current index: {currentIndex}, Total questions: {questions.length}</p>
+          <Button 
+            onClick={() => setCurrentIndex(0)}
+            variant="default"
+            className="mt-4"
+          >
+            Reset to first question
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <AnimatedBackground />
-      
-      {/* Gradient Overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-slate-50/95 via-blue-50/90 to-purple-50/95 z-10" />
-      
+    <div className="min-h-screen bg-background">
       {/* Content */}
       <div className="relative z-30">
         {/* Top Bar */}
-        <header className="border-b border-blue-200/30 bg-white/80 backdrop-blur-md shadow-xl">
+        <header className="border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
           <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
             {/* Left: Exit - Mobile optimized */}
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-slate-600 hover:text-slate-800 hover:bg-blue-100/50 text-xs sm:text-sm px-1 sm:px-4"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent transition-base text-xs sm:text-sm px-1 sm:px-4"
               onClick={handleExitInterview}
             >
               <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-0 sm:mr-2" />
@@ -259,24 +244,24 @@ const Interview = () => {
             {/* Center: Progress */}
             <div className="flex-1 mx-2 sm:mx-4 lg:mx-8">
               <div className="text-center mb-2">
-                <span className="text-xs sm:text-sm font-medium text-slate-700">
+                <span className="text-xs sm:text-sm font-medium text-muted-foreground">
                   {currentIndex + 1}/{questions.length}
                 </span>
               </div>
-              <Progress value={progress} className="h-1.5 sm:h-2 bg-blue-100" />
+              <Progress value={progress} className="h-1.5 sm:h-2 bg-muted" />
             </div>
             
             {/* Right: Timer & Next - Mobile optimized */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
-              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-slate-700 bg-blue-50 px-1 sm:px-3 py-1 sm:py-1.5 rounded-lg">
-                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-muted-foreground bg-accent/50 px-1 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                 <span className="tabular-nums text-xs sm:text-sm">{timeRemaining}</span>
               </div>
               {!isSubmitted && (
                 <Button 
                   size="sm" 
                   onClick={handleNext} 
-                  variant="gradient"
+                  variant="default"
                   className="text-xs px-1 sm:px-4"
                 >
                   <span className="hidden md:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Skip'}</span>
@@ -288,7 +273,7 @@ const Interview = () => {
                 <Button 
                   size="sm" 
                   onClick={handleNext} 
-                  variant="gradient"
+                  variant="default"
                   className="text-xs px-1 sm:px-4"
                 >
                   <span className="hidden md:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Next'}</span>
@@ -341,9 +326,9 @@ const Interview = () => {
           <Button 
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            variant="gradient"
+            variant="outline"
             size="sm"
-            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            className="disabled:opacity-50 disabled:cursor-not-allowed transition-base"
           >
             <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Previous</span>
@@ -352,7 +337,7 @@ const Interview = () => {
           
           <div className="flex gap-3">
             {isEvaluating && (
-              <div className="text-xs sm:text-sm text-slate-600 self-center bg-blue-50 px-2 sm:px-3 py-1 rounded-lg">
+              <div className="text-xs sm:text-sm text-muted-foreground self-center bg-accent/50 px-2 sm:px-3 py-1 rounded-lg">
                 <span className="hidden sm:inline">Evaluating answer...</span>
                 <span className="sm:hidden">Evaluating...</span>
               </div>

@@ -52,7 +52,7 @@ export const LanguageSelector = ({
             </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-50 bg-background border border-border shadow-lg">
           {languages.map((language) => {
             const isAvailable = availableLanguages.includes(language.id);
             return (

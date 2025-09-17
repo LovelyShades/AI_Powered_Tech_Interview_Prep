@@ -6,7 +6,7 @@ type TestDetail = {
   name: string;
   passed: boolean;
   input: any;
-  expect: any;
+  expected: any;
   actual?: any;
   error?: string;
   status?: 'PASS' | 'FAIL' | 'TIMEOUT' | 'COMPILE_ERROR' | 'RUNTIME_ERROR' | 'NO_OUTPUT';
@@ -135,7 +135,7 @@ export const FeedbackPanel = ({
                           </div>
 
                           <div className="text-slate-600 break-all">Input: {JSON.stringify(test.input)}</div>
-                          <div className="text-slate-600 break-all">Expected: {JSON.stringify(test.expect)}</div>
+                          <div className="text-slate-600 break-all">Expected: {JSON.stringify(test.expected)}</div>
                           {failed && (
                             <div className="text-slate-600 break-all">
                               Got: {renderGotValue(test)}

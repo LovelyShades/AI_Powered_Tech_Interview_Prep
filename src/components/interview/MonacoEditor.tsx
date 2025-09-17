@@ -189,7 +189,15 @@ export const MonacoEditor = ({
       const newErrors = result.results
         .filter((r: any) => !r.passed)
         .map((r: any) => {
-          const actualValue = r.actual === null || r.actual === undefined ? "null" : r.actual;
+          // Handle special case where actual value is an object with _type
+          let actualValue;
+          if (r.actual && typeof r.actual === 'object' && r.actual._type === 'undefined') {
+            actualValue = "undefined";
+          } else if (r.actual === null || r.actual === undefined) {
+            actualValue = "null";
+          } else {
+            actualValue = r.actual;
+          }
           const expectedValue = r.expected;
 
           return {
@@ -331,9 +339,6 @@ export const MonacoEditor = ({
               disabled={isSubmitted}
             />
           )}
-
-          {/* Error Display */}
-          <ErrorDisplay errors={errors} isVisible={errors.length > 0} />
 
           {/* Editor Container */}
           <div className="h-96 border rounded-lg overflow-hidden">
