@@ -253,16 +253,17 @@ export const LiveInterviewPanel = ({
           {voiceEnabled && (
             <div className="flex items-center gap-2">
               {isPlayingVoice && (
-                <Badge variant="secondary" className="gap-2">
+                <Badge variant="outline" className="gap-2 bg-primary/10 text-primary border-primary/20">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                   Playing
                 </Badge>
               )}
               <Button
                 size="sm"
-                variant="ghost"
+                variant="outline"
                 onClick={handleVoiceControl}
                 disabled={!isPlayingVoice}
+                className="h-8 w-8 p-0"
               >
                 {isPlayingVoice ? (
                   <Pause className="h-3 w-3" />
@@ -272,9 +273,10 @@ export const LiveInterviewPanel = ({
               </Button>
               <Button
                 size="sm"
-                variant="ghost"
+                variant="outline"
                 onClick={() => voicePlayerRef.current?.stop()}
                 disabled={!isPlayingVoice}
+                className="h-8 w-8 p-0"
               >
                 <VolumeX className="h-3 w-3" />
               </Button>
@@ -284,7 +286,14 @@ export const LiveInterviewPanel = ({
 
         {/* Recording Status */}
         <div className="flex items-center justify-center">
-          <Badge variant={state === 'recording' ? 'destructive' : 'secondary'}>
+          <Badge 
+            variant="outline" 
+            className={`${
+              state === 'recording' 
+                ? 'bg-destructive/10 text-destructive border-destructive/20 animate-pulse' 
+                : 'bg-primary/10 text-primary border-primary/20'
+            }`}
+          >
             {state === 'idle' && 'Ready to record'}
             {state === 'recording' && '● Recording'}
             {state === 'stopped' && 'Recording complete'}
@@ -308,14 +317,14 @@ export const LiveInterviewPanel = ({
         {/* Controls */}
         <div className="flex justify-center gap-3">
           {state === 'idle' && (
-            <Button onClick={handleStartRecording}>
+            <Button variant="primary" onClick={handleStartRecording}>
               <Mic className="h-4 w-4 mr-2" />
               Start Recording
             </Button>
           )}
           
           {state === 'recording' && (
-            <Button variant="outline" onClick={handleStopRecording}>
+            <Button variant="destructive" onClick={handleStopRecording}>
               <Square className="h-4 w-4 mr-2" />
               Stop Recording
             </Button>
@@ -328,6 +337,7 @@ export const LiveInterviewPanel = ({
                 Record Again
               </Button>
               <Button
+                variant="primary"
                 onClick={handleSubmitAnswer}
                 disabled={submitting}
               >

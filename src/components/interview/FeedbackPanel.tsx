@@ -63,17 +63,17 @@ export const FeedbackPanel = ({
   const hasTests = !!testResults && typeof testResults.total === 'number';
 
   return (
-    <Card className="mt-4 sm:mt-6 bg-white/80 backdrop-blur-md border border-blue-200/50 shadow-xl">
+    <Card className="bg-card/80 backdrop-blur-md border-border shadow-xl">
       <CardHeader className="pb-4 sm:pb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-          <CardTitle className="flex items-center gap-2 text-slate-800 text-base sm:text-lg">
-            <Target className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+          <CardTitle className="flex items-center gap-2 text-foreground text-base sm:text-lg">
+            <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Feedback
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className={`${score >= 90 ? 'bg-green-100 text-green-700 border-green-200'
-              : score >= 70 ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
-              : 'bg-red-100 text-red-700 border-red-200'} font-medium text-sm`}>
+            <Badge variant="outline" className={`${score >= 90 ? 'bg-success/20 text-success border-success/30'
+              : score >= 70 ? 'bg-primary/20 text-primary border-primary/30'
+              : 'bg-destructive/20 text-destructive border-destructive/30'} font-medium text-sm`}>
               {score}/100 ({getGrade(score)})
             </Badge>
           </div>
@@ -92,10 +92,10 @@ export const FeedbackPanel = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2 mb-3">
                 <Badge className={`${testResults!.passed === testResults!.total
-                    ? 'bg-green-100 text-green-700 border-green-200'
+                    ? 'bg-success/20 text-success border-success/30'
                     : testResults!.passed === 0
-                      ? 'bg-red-100 text-red-700 border-red-200'
-                      : 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                      ? 'bg-destructive/20 text-destructive border-destructive/30'
+                      : 'bg-primary/20 text-primary border-primary/30'
                   } font-medium text-sm`}>
                   {testResults!.passed}/{testResults!.total} passed
                 </Badge>
@@ -122,12 +122,12 @@ export const FeedbackPanel = ({
                             <div className="font-medium text-slate-800 break-words">{test.name}</div>
                             <Badge
                               className={
-                                test.status === 'PASS' ? 'bg-green-100 text-green-700 border-green-200' :
-                                test.status === 'TIMEOUT' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
-                                test.status === 'COMPILE_ERROR' ? 'bg-orange-100 text-orange-700 border-orange-200' :
-                                test.status === 'RUNTIME_ERROR' ? 'bg-red-100 text-red-700 border-red-200' :
-                                test.status === 'NO_OUTPUT' ? 'bg-slate-100 text-slate-700 border-slate-200' :
-                                'bg-red-100 text-red-700 border-red-200'
+                                test.status === 'PASS' ? 'bg-success/20 text-success border-success/30' :
+                                test.status === 'TIMEOUT' ? 'bg-primary/20 text-primary border-primary/30' :
+                                test.status === 'COMPILE_ERROR' ? 'bg-destructive/30 text-destructive border-destructive/40' :
+                                test.status === 'RUNTIME_ERROR' ? 'bg-destructive/20 text-destructive border-destructive/30' :
+                                test.status === 'NO_OUTPUT' ? 'bg-muted/50 text-muted-foreground border-muted' :
+                                'bg-destructive/20 text-destructive border-destructive/30'
                               }
                             >
                               {test.status?.replace('_', ' ')}

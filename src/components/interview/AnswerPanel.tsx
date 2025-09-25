@@ -134,9 +134,9 @@ export const AnswerPanel = ({
     }
 
     return (
-      <Card className="bg-white/80 backdrop-blur-md border border-blue-200/50 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-lg text-slate-800">Your Solution</CardTitle>
+    <Card className="bg-card/80 backdrop-blur-md border-border shadow-xl">
+      <CardHeader>
+          <CardTitle className="text-lg text-foreground">Your Solution</CardTitle>
         </CardHeader>
         <CardContent>
           <MonacoEditor
@@ -157,9 +157,9 @@ export const AnswerPanel = ({
 
   // Text-based questions (Behavioral, Theory)
   return (
-    <Card className="bg-white/80 backdrop-blur-md border border-blue-200/50 shadow-xl">
+    <Card className="bg-card/80 backdrop-blur-md border-border shadow-xl">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-800">Your Answer</CardTitle>
+        <CardTitle className="text-lg text-foreground">Your Answer</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
@@ -167,7 +167,7 @@ export const AnswerPanel = ({
           placeholder="Type your answer here..."
           value={localText}
           onChange={(e) => handleTextChange(e.target.value)}
-          className="min-h-[200px] resize-none bg-white/70 border-blue-200 focus:border-blue-400 text-slate-700 placeholder-slate-500"
+          className="min-h-[200px] resize-none bg-card/80 border-border focus:border-primary text-foreground placeholder-muted-foreground backdrop-blur-sm"
           disabled={isSubmitted}
           readOnly={isSubmitted}
         />
@@ -177,7 +177,7 @@ export const AnswerPanel = ({
             <Button
               onClick={handleSubmitText}
               disabled={!localText.trim()}
-              variant="gradient"
+              variant="primary"
               size="lg"
             >
               Submit Answer

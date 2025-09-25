@@ -131,7 +131,7 @@ const Results = () => {
         <div className="text-center bg-card rounded-2xl p-8 border shadow-lg max-w-md mx-4">
           <h2 className="text-2xl font-bold mb-2 text-foreground">No results found</h2>
           <p className="text-muted-foreground mb-4">Unable to load interview results.</p>
-          <Button onClick={handleBackToHome} variant="hero">Back to Home</Button>
+          <Button onClick={handleBackToHome} variant="cta">Back to Home</Button>
         </div>
       </div>
     );
@@ -141,29 +141,29 @@ const Results = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="mx-auto max-w-6xl px-6 py-4">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
-                <Brain className="h-6 w-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
+                <Brain className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">InterviewAI</h1>
-                <p className="text-sm text-muted-foreground">Interview Results</p>
+                <h1 className="text-lg sm:text-xl font-bold text-foreground">InterviewAI</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">Interview Results</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button size="sm" variant="outline" onClick={() => navigator.share?.({ title: 'My Interview Results', url: window.location.href })}>
-                <Share className="h-4 w-4 mr-2" />
-                Share
+            <div className="flex items-center gap-1 sm:gap-3">
+              <Button size="sm" variant="outline" onClick={() => navigator.share?.({ title: 'My Interview Results', url: window.location.href })} className="p-2 sm:px-3">
+                <Share className="h-4 w-4" />
+                <span className="hidden sm:inline sm:ml-2">Share</span>
               </Button>
-              <Button size="sm" variant="outline" onClick={handleRetake}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Retake
+              <Button size="sm" variant="outline" onClick={handleRetake} className="p-2 sm:px-3">
+                <RotateCcw className="h-4 w-4" />
+                <span className="hidden sm:inline sm:ml-2">Retake</span>
               </Button>
-              <Button size="sm" variant="hero" onClick={handleBackToHome}>
-                <Home className="h-4 w-4 mr-2" />
-                Home
+              <Button size="sm" variant="cta" onClick={handleBackToHome} className="p-2 sm:px-3">
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline sm:ml-2">Home</span>
               </Button>
             </div>
           </div>
@@ -171,44 +171,44 @@ const Results = () => {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-6xl px-6 py-12">
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12">
         {/* Overall Score */}
-        <Card className="mb-12 shadow-lg border-border/50">
-          <CardHeader className="text-center pb-6">
-            <div className="space-y-6">
-              <div className={`inline-flex h-32 w-32 items-center justify-center rounded-full text-6xl font-bold transition-smooth ${getGradeColor(sessionResults.grade)}`}>
+        <Card className="mb-8 sm:mb-12 shadow-lg border-border/50">
+          <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
+            <div className="space-y-4 sm:space-y-6">
+              <div className={`inline-flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full text-4xl sm:text-6xl font-bold transition-smooth ${getGradeColor(sessionResults.grade)}`}>
                 {sessionResults.grade}
               </div>
               <div>
-                <CardTitle className="text-5xl font-bold text-foreground mb-2">
+                <CardTitle className="text-3xl sm:text-5xl font-bold text-foreground mb-2">
                   {sessionResults.totalScore}/100
                 </CardTitle>
-                <p className="text-muted-foreground text-lg">
+                <p className="text-muted-foreground text-sm sm:text-lg px-2">
                   Completed on {sessionResults.completedAt} • Duration: {sessionResults.duration}
                 </p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-6">
+          <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+            <div className="space-y-4 sm:space-y-6">
               <div className="flex justify-between text-sm font-medium text-foreground">
                 <span>Overall Performance</span>
                 <span>{sessionResults.totalScore}%</span>
               </div>
-              <Progress value={sessionResults.totalScore} className="h-4" />
-              <div className="grid grid-cols-3 gap-6 pt-4">
-                <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl">
-                  <div className="text-3xl font-bold text-primary mb-1">{sessionResults.questions.length}</div>
+              <Progress value={sessionResults.totalScore} className="h-3 sm:h-4" />
+              <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-2 sm:pt-4">
+                <div className="text-center p-2 sm:p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg sm:rounded-xl">
+                  <div className="text-xl sm:text-3xl font-bold text-primary mb-1">{sessionResults.questions.length}</div>
                   <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Questions</div>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-success/10 to-success/5 rounded-xl">
-                  <div className="text-3xl font-bold text-success mb-1">
+                <div className="text-center p-2 sm:p-4 bg-gradient-to-br from-success/10 to-success/5 rounded-lg sm:rounded-xl">
+                  <div className="text-xl sm:text-3xl font-bold text-success mb-1">
                     {sessionResults.questions.filter((q: any) => q.score >= 70).length}
                   </div>
                   <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Passed</div>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl">
-                  <div className="text-3xl font-bold text-accent mb-1">{sessionResults.grade}</div>
+                <div className="text-center p-2 sm:p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg sm:rounded-xl">
+                  <div className="text-xl sm:text-3xl font-bold text-accent mb-1">{sessionResults.grade}</div>
                   <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Grade</div>
                 </div>
               </div>
@@ -217,63 +217,63 @@ const Results = () => {
         </Card>
 
         {/* Question Breakdown */}
-        <div className="space-y-8">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <h2 className="text-3xl font-bold text-foreground">Question Breakdown</h2>
+        <div className="space-y-6 sm:space-y-8">
+          <div className="flex items-center gap-2 sm:gap-3 px-1">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Question Breakdown</h2>
           </div>
           
           {sessionResults.questions.map((question: any, index: number) => (
             <Card key={question.id} className="shadow-lg border-border/50 hover:shadow-xl transition-smooth">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-white text-xl font-bold shadow-glow">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-primary text-white text-lg sm:text-xl font-bold shadow-glow flex-shrink-0">
                       {index + 1}
                     </div>
-                    <div>
-                      <CardTitle className="text-xl text-foreground mb-2">{question.title}</CardTitle>
-                      <div className="flex items-center gap-3">
-                        <Badge variant="secondary" className="font-medium">{question.difficulty}</Badge>
-                        <Badge variant="outline" className="font-medium">{question.type}</Badge>
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-lg sm:text-xl text-foreground mb-2 break-words">{question.title}</CardTitle>
+                      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                        <Badge variant="secondary" className="font-medium text-xs">{question.difficulty}</Badge>
+                        <Badge variant="outline" className="font-medium text-xs">{question.type}</Badge>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-4xl font-bold text-foreground">{question.score}</div>
-                    <div className="text-sm text-muted-foreground font-medium">/ 100</div>
+                  <div className="text-right sm:text-center flex-shrink-0">
+                    <div className="text-3xl sm:text-4xl font-bold text-foreground">{question.score}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground font-medium">/ 100</div>
                   </div>
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-6 pt-2">
+              <CardContent className="space-y-4 sm:space-y-6 pt-2 px-4 sm:px-6">
                 {/* Score Progress */}
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <div className="flex justify-between text-sm font-medium text-foreground">
                     <span>Score</span>
                     <span>{question.score}%</span>
                   </div>
-                  <Progress value={question.score} className="h-3" />
+                  <Progress value={question.score} className="h-2 sm:h-3" />
                 </div>
 
                 {/* Feedback */}
                 <div>
-                  <h4 className="font-semibold mb-3 flex items-center gap-2 text-foreground">
-                    <Target className="h-5 w-5 text-success" />
+                  <h4 className="font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-foreground text-sm sm:text-base">
+                    <Target className="h-4 w-4 sm:h-5 sm:w-5 text-success flex-shrink-0" />
                     Feedback
                   </h4>
-                  <div className="text-sm text-foreground bg-success/5 p-4 rounded-xl border border-success/20">
+                  <div className="text-xs sm:text-sm text-foreground bg-success/5 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-success/20 break-words">
                     {question.feedback}
                   </div>
                 </div>
 
                 {/* Solution */}
                 <div>
-                  <h4 className="font-semibold mb-3 flex items-center gap-2 text-foreground">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                  <h4 className="font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-foreground text-sm sm:text-base">
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                     Recommended Solution
                   </h4>
-                  <div className="text-sm text-foreground bg-primary/5 p-4 rounded-xl border border-primary/20">
+                  <div className="text-xs sm:text-sm text-foreground bg-primary/5 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-primary/20 break-words">
                     {question.solution}
                   </div>
                 </div>
@@ -282,14 +282,14 @@ const Results = () => {
           ))}
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-16 flex justify-center gap-6">
-          <Button size="lg" variant="outline" onClick={handleRetake} className="px-8 py-4 text-base">
-            <RotateCcw className="h-5 w-5 mr-3" />
+        {/* Action Buttons */}  
+        <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 px-4">
+          <Button size="lg" variant="outline" onClick={handleRetake} className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base w-full sm:w-auto">
+            <RotateCcw className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
             Practice Again
           </Button>
-          <Button size="lg" variant="hero" onClick={handleBackToHome} className="px-8 py-4 text-base">
-            <Home className="h-5 w-5 mr-3" />
+          <Button size="lg" variant="cta" onClick={handleBackToHome} className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base w-full sm:w-auto">
+            <Home className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
             Back to Home
           </Button>
         </div>

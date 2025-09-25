@@ -41,31 +41,31 @@ export const QuestionPanel = ({
   };
 
   return (
-    <Card className="bg-white/80 backdrop-blur-md border border-blue-200/50 shadow-xl">
+    <Card className="bg-card/80 backdrop-blur-md border-border shadow-xl">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl text-slate-800">{question.title}</CardTitle>
+          <CardTitle className="text-xl text-foreground">{question.title}</CardTitle>
           <div className="flex items-center gap-2">
             <Badge 
               variant={getDifficultyVariant(question.difficulty)}
-              className={`${question.difficulty === 'Easy' ? 'bg-green-100 text-green-700 border-green-200' : 
-                         question.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 
-                         'bg-red-100 text-red-700 border-red-200'}`}
+              className={`${question.difficulty === 'Easy' ? 'bg-success/20 text-success border-success/30' : 
+                         question.difficulty === 'Medium' ? 'bg-primary/20 text-primary border-primary/30' : 
+                         'bg-destructive/20 text-destructive border-destructive/30'}`}
             >
               {question.difficulty}
             </Badge>
-            <Badge variant="outline" className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="flex items-center gap-1 bg-accent/20 text-accent border-accent/30">
               {getTypeIcon(question.qtype)}
               {question.qtype}
             </Badge>
           </div>
         </div>
-        <div className="text-sm text-slate-600">
+        <div className="text-sm text-muted-foreground">
           Question {questionNumber} of {totalQuestions}
         </div>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm max-w-none text-slate-700">
+        <div className="prose prose-sm max-w-none text-foreground">
           <div className="whitespace-pre-line leading-relaxed">
             {question.prompt}
           </div>
@@ -73,9 +73,9 @@ export const QuestionPanel = ({
           {/* Function signature for coding questions */}
           {question.qtype === 'Coding' && question.signature && (
             <div className="mt-4">
-              <h4 className="text-slate-800 font-semibold mb-2">Function Signature:</h4>
-              <pre className="bg-slate-50 border border-slate-200 p-3 rounded-lg overflow-x-auto">
-                <code className="text-slate-700">{question.signature}</code>
+              <h4 className="text-foreground font-semibold mb-2">Function Signature:</h4>
+              <pre className="bg-muted/50 border border-border p-3 rounded-lg overflow-x-auto">
+                <code className="text-foreground">{question.signature}</code>
               </pre>
             </div>
           )}

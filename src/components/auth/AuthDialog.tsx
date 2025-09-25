@@ -166,7 +166,7 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
             </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" variant="primary" size="lg" className="w-full" disabled={loading}>
             {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
           </Button>
         </form>
@@ -182,6 +182,7 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
 
         <Button
           variant="outline"
+          size="lg"
           onClick={handleGoogleAuth}
           disabled={loading}
           className="w-full"

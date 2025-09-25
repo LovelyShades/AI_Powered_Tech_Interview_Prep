@@ -158,15 +158,15 @@ const Landing = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowSettings(true)}
-                className="transition-smooth"
+                className="transition-smooth p-2 sm:px-3"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline sm:ml-2">Settings</span>
               </Button>
               <AuthButton />
             </div>
@@ -243,7 +243,7 @@ const Landing = () => {
 
           {/* CTA Button */}
           <Button
-            variant="hero"
+            variant="cta"
             size="lg"
             onClick={handleStartInterview}
             disabled={isStarting}

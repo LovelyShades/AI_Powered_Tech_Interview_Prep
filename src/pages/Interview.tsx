@@ -253,7 +253,7 @@ const Interview = () => {
             
             {/* Right: Timer & Next - Mobile optimized */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
-              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-muted-foreground bg-accent/50 px-1 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+              <div className="flex items-center gap-1 text-xs sm:text-sm font-semibold text-primary bg-primary/10 border border-primary/20 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
                 <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                 <span className="tabular-nums text-xs sm:text-sm">{timeRemaining}</span>
               </div>
@@ -261,7 +261,7 @@ const Interview = () => {
                 <Button 
                   size="sm" 
                   onClick={handleNext} 
-                  variant="default"
+                  variant="primary"
                   className="text-xs px-1 sm:px-4"
                 >
                   <span className="hidden md:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Skip'}</span>
@@ -273,7 +273,7 @@ const Interview = () => {
                 <Button 
                   size="sm" 
                   onClick={handleNext} 
-                  variant="default"
+                  variant="primary"
                   className="text-xs px-1 sm:px-4"
                 >
                   <span className="hidden md:inline">{currentIndex === questions.length - 1 ? 'Finish' : 'Next'}</span>
@@ -337,7 +337,7 @@ const Interview = () => {
           
           <div className="flex gap-3">
             {isEvaluating && (
-              <div className="text-xs sm:text-sm text-muted-foreground self-center bg-accent/50 px-2 sm:px-3 py-1 rounded-lg">
+              <div className="text-xs sm:text-sm text-primary font-semibold self-center bg-primary/10 border border-primary/20 px-2 sm:px-3 py-1 rounded-lg shadow-sm">
                 <span className="hidden sm:inline">Evaluating answer...</span>
                 <span className="sm:hidden">Evaluating...</span>
               </div>

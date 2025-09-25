@@ -36,15 +36,15 @@ export const AuthButton = () => {
 
   if (loading) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled
-        className="text-white hover:bg-white/10"
-      >
-        <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-        Loading...
-      </Button>
+        <Button
+          variant="nav"
+          size="sm"
+          disabled
+          className="p-2 sm:px-3"
+        >
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="hidden sm:inline sm:ml-2">Loading...</span>
+        </Button>
     );
   }
 
@@ -54,17 +54,17 @@ export const AuthButton = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="nav"
               size="sm"
-              className="text-white hover:bg-white/10"
+              className="p-2 sm:px-3"
             >
-              <User className="h-4 w-4 mr-2" />
-              {user?.email?.split('@')[0] || "Profile"}
-              <ChevronDown className="h-3 w-3 ml-1" />
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline sm:ml-2">{user?.email?.split('@')[0] || "Profile"}</span>
+              <ChevronDown className="h-3 w-3 ml-1 hidden sm:inline" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={handleSignOut}>
+          <DropdownMenuContent align="end" className="w-48 bg-card border-border shadow-lg">
+            <DropdownMenuItem onClick={handleSignOut} className="text-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer">
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </DropdownMenuItem>
@@ -72,13 +72,13 @@ export const AuthButton = () => {
         </DropdownMenu>
       ) : (
         <Button
-          variant="ghost"
+          variant="nav"
           size="sm"
           onClick={handleAuthClick}
-          className="text-white hover:bg-white/10"
+          className="p-2 sm:px-3"
         >
-          <LogIn className="h-4 w-4 mr-2" />
-          Sign In
+          <LogIn className="h-4 w-4" />
+          <span className="hidden sm:inline sm:ml-2">Sign In</span>
         </Button>
       )}
 

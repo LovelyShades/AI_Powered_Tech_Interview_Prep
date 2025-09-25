@@ -288,40 +288,49 @@ export const MonacoEditor = ({
 
             {/* Fullscreen Controls */}
             {!readOnly && (
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between bg-background/90 backdrop-blur-sm border rounded-lg p-3">
-                <div className="flex gap-2">
-                  <Button
-                    variant="gradient"
-                    size="sm"
-                    onClick={handleRunTests}
-                    disabled={isSubmitted || isRunning}
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    {isRunning ? "Running..." : "Run Tests (⌘+Enter)"}
-                  </Button>
-
-                  {!isSubmitted && (
-                    <Button variant="gradient" size="sm" onClick={handleSubmit} disabled={isRunning}>
-                      Submit Answer
+              <div className="absolute bottom-4 left-4 right-4 z-20">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleRunTests}
+                      disabled={isSubmitted || isRunning}
+                      className="flex-1 sm:flex-none min-w-0"
+                    >
+                      <Play className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{isRunning ? "Running..." : "Run Tests"}</span>
                     </Button>
-                  )}
-                </div>
 
-                {/* Test Results in Fullscreen */}
-                {testResults.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
-                      {testResults.filter((r) => r.passed).length} passed
-                    </Badge>
-                    {testResults.some((r) => !r.passed) && (
-                      <Badge variant="secondary" className="text-xs">
-                        <XCircle className="h-3 w-3 mr-1 text-red-600" />
-                        {testResults.filter((r) => !r.passed).length} failed
-                      </Badge>
+                    {!isSubmitted && (
+                      <Button 
+                        variant="primary" 
+                        size="sm" 
+                        onClick={handleSubmit} 
+                        disabled={isRunning}
+                        className="flex-1 sm:flex-none min-w-0"
+                      >
+                        <span className="truncate">Submit Answer</span>
+                      </Button>
                     )}
                   </div>
-                )}
+
+                  {/* Test Results in Fullscreen */}
+                  {testResults.length > 0 && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        {testResults.filter((r) => r.passed).length} passed
+                      </Badge>
+                      {testResults.some((r) => !r.passed) && (
+                        <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/20">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          {testResults.filter((r) => !r.passed).length} failed
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -367,7 +376,7 @@ export const MonacoEditor = ({
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <div className="flex gap-2 flex-1">
                 <Button
-                  variant="gradient"
+                  variant="primary"
                   size="sm"
                   onClick={handleRunTests}
                   disabled={isSubmitted || isRunning}
@@ -380,7 +389,7 @@ export const MonacoEditor = ({
 
                 {!isSubmitted && (
                   <Button
-                    variant="gradient"
+                    variant="primary"
                     size="sm"
                     onClick={handleSubmit}
                     disabled={isRunning}

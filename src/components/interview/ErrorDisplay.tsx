@@ -97,7 +97,7 @@ export const ErrorDisplay = ({ errors, isVisible }: ErrorDisplayProps) => {
                       {error.message}
                     </AlertDescription>
                     {error.details && (
-                      <div className="mt-2 p-2 bg-gray-50 rounded text-xs font-mono text-gray-600 overflow-x-auto whitespace-pre-wrap">
+                      <div className="mt-2 p-2 bg-muted/50 rounded text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
                         {error.details}
                       </div>
                     )}
