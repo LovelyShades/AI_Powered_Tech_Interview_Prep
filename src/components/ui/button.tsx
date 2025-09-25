@@ -18,7 +18,7 @@ const buttonVariants = cva(
         gradient: "bg-gradient-primary text-primary-foreground shadow-lg font-medium hover:scale-105 transition-smooth",
         hero: "bg-gradient-hero text-white font-bold shadow-glow transition-smooth hover:scale-105",
         primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md font-semibold transition-smooth hover:shadow-lg",
-        nav: "bg-primary/20 border-2 border-primary/40 text-white font-medium hover:bg-primary/30 hover:border-primary/50 backdrop-blur-sm transition-smooth shadow-md hover:shadow-lg",
+        nav: "bg-primary border-2 border-primary text-primary-foreground font-medium hover:bg-primary/90 hover:border-primary/70 backdrop-blur-sm transition-smooth shadow-md hover:shadow-lg",
         cta: "bg-gradient-hero text-white font-bold shadow-glow transition-smooth hover:scale-105",
       },
       size: {
