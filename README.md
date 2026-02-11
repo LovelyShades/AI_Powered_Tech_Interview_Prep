@@ -35,20 +35,8 @@ This project is **not intended for reuse** but serves as a **public demonstratio
 
 ## 🎬 Showcase
 
-<p align="center">
-  <img src="docs/gifs/live_interview.gif" alt="Live Interview"><br>
-  <em>Speaking into the live interview panel with transcript preview</em>
-</p>
+[![Watch the video](https://img.youtube.com/vi/JQwXc9wWWIs/maxresdefault.jpg)](https://youtu.be/JQwXc9wWWIs)
 
-<p align="center">
-  <img src="docs/gifs/coding_mode.gif" alt="Coding Mode"><br>
-  <em>Solving a coding question with test feedback</em>
-</p>
-
-<p align="center">
-  <img src="docs/gifs/feedback.gif" alt="Feedback"><br>
-  <em>Quick feedback highlighting strengths and improvements</em>
-</p>
 
 ---
 
