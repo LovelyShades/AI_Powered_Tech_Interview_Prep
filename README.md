@@ -36,7 +36,7 @@ This project is **not intended for reuse** but serves as a **public demonstratio
 
 ### 🎥 Watch the Demo ✨
 
-[![Watch Demo](https://img.youtube.com/vi/JQwXc9wWWIs/maxresdefault.jpg)](https://www.youtube.com/watch?v=JQwXc9wWWIs)
+
 
 
 
