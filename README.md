@@ -35,7 +35,7 @@ This project is **not intended for reuse** but serves as a **public demonstratio
 
 ## 🎬 Showcase
 
-[![Watch the video](https://img.youtube.com/vi/JQwXc9wWWIs/maxresdefault.jpg)](https://youtu.be/JQwXc9wWWIs)
+[![Watch Demo](https://img.youtube.com/vi/JQwXc9wWWIs/maxresdefault.jpg)](https://www.youtube.com/watch?v=JQwXc9wWWIs)
 
 
 ---
